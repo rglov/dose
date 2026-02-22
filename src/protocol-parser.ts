@@ -8,10 +8,15 @@ export function parseProtocol(content: string, filePath: string): Protocol | nul
   const frontmatter = parseFrontmatter(content);
   if (!frontmatter) return null;
 
+  const VALID_STATUSES: ProtocolStatus[] = ['active', 'planned', 'paused', 'completed'];
+  const rawStatus = frontmatter['status'];
+
   return {
     id: filePath,
     name: frontmatter['name'] ?? 'Unknown',
-    status: (frontmatter['status'] as ProtocolStatus) ?? 'planned',
+    status: VALID_STATUSES.includes(rawStatus as ProtocolStatus)
+      ? (rawStatus as ProtocolStatus)
+      : 'planned',
     startDate: frontmatter['start_date'] ?? '',
     durationWeeks: Number(frontmatter['duration_weeks']) || 0,
     compounds: parseCompounds(content),
@@ -20,11 +25,11 @@ export function parseProtocol(content: string, filePath: string): Protocol | nul
 }
 
 function parseFrontmatter(content: string): Record<string, string> | null {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
 
   const result: Record<string, string> = {};
-  for (const line of match[1].split('\n')) {
+  for (const line of match[1].split(/\r?\n/)) {
     const colonIdx = line.indexOf(':');
     if (colonIdx < 0) continue;
     const key = line.slice(0, colonIdx).trim();

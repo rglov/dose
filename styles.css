@@ -1,0 +1,166 @@
+/* Tab bar */
+.dose-tab-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dose-tab-btn {
+  padding: 4px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.dose-tab-btn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.dose-tab-content {
+  padding: 12px;
+  overflow-y: auto;
+}
+
+/* Today tab */
+.dose-today-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dose-today-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dose-done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.dose-log-btn {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.dose-skip-btn {
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+/* Dashboard */
+.dose-progress {
+  margin-bottom: 12px;
+}
+
+.dose-progress-bar {
+  height: 8px;
+  background: var(--background-modifier-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.dose-progress-fill {
+  height: 100%;
+  background: var(--interactive-accent);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.dose-adherence-list {
+  list-style: none;
+  padding: 0;
+}
+
+.dose-adherence-list li {
+  padding: 4px 0;
+}
+
+.dose-heatmap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0 16px;
+}
+
+.dose-heatmap-cell {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: default;
+}
+
+.dose-heatmap-cell.full    { background: var(--color-green); }
+.dose-heatmap-cell.partial { background: var(--color-yellow); }
+.dose-heatmap-cell.missed  { background: var(--color-red); }
+.dose-heatmap-cell.none    { background: var(--background-modifier-border); }
+
+.dose-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+
+.dose-history-table th,
+.dose-history-table td {
+  padding: 4px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Planning tab */
+.dose-protocol-list {
+  list-style: none;
+  padding: 0;
+}
+
+.dose-protocol-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dose-protocol-info {
+  margin-bottom: 6px;
+}
+
+.dose-compound-list {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin: 4px 0 0 16px;
+}
+
+.dose-protocol-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dose-active-badge {
+  color: var(--color-green);
+  font-weight: 500;
+}
+
+.dose-refresh-btn {
+  margin-top: 16px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+}

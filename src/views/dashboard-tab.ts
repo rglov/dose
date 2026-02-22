@@ -1,5 +1,5 @@
 import DosePlugin from '../main';
-import { calculateAdherence, calculateStreak, getDueToday } from '../schedule';
+import { calculateAdherence, calculateStreak, getDueToday, getExpectedDoseCount } from '../schedule';
 import { DoseLog, Protocol } from '../types';
 
 export function renderDashboardTab(el: HTMLElement, plugin: DosePlugin): void {
@@ -56,15 +56,20 @@ function renderHeatmap(el: HTMLElement, protocol: Protocol, logs: DoseLog[], tod
   for (let i = 29; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+    ].join('-');
 
     const dueCompounds = getDueToday(protocol, date);
     const dayLogs = logs.filter(l => l.timestamp.startsWith(dateStr) && l.status === 'taken');
+    const totalExpected = dueCompounds.reduce((sum, c) => sum + getExpectedDoseCount(c), 0);
 
     let cls = 'dose-heatmap-cell';
     if (!dueCompounds.length) cls += ' none';
     else if (dayLogs.length === 0) cls += ' missed';
-    else if (dayLogs.length < dueCompounds.length) cls += ' partial';
+    else if (dayLogs.length < totalExpected) cls += ' partial';
     else cls += ' full';
 
     const cell = grid.createDiv({ cls });

@@ -14,7 +14,11 @@ export function renderTodayTab(el: HTMLElement, plugin: DosePlugin, refresh: () 
   }
 
   const today = new Date();
-  const dateStr = today.toISOString().split('T')[0];
+  const dateStr = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, '0'),
+    String(today.getDate()).padStart(2, '0'),
+  ].join('-');
   const dueCompounds = getDueToday(protocol, today);
   const todayLogs = plugin.store.getDoseLogsForDate(dateStr);
 
@@ -56,7 +60,12 @@ export function renderTodayTab(el: HTMLElement, plugin: DosePlugin, refresh: () 
           async (log) => {
             plugin.store.addDoseLog(log);
             await plugin.store.save();
-            await appendDoseToNote(plugin.app, settings.dailyNotesFolder, log);
+            try {
+              await appendDoseToNote(plugin.app, settings.dailyNotesFolder, log);
+            } catch (err) {
+              console.error('[Dose] Failed to write to daily note:', err);
+              new Notice('Dose logged but failed to write to daily note. Check console.');
+            }
             new Notice(`Logged ${compound.name}`);
             refresh();
           },

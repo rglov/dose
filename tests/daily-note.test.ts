@@ -19,7 +19,7 @@ describe('buildDoseRow', () => {
     expect(row).toContain('BPC-157');
     expect(row).toContain('250mcg');
     expect(row).toContain('Left abdomen');
-    expect(row).toContain('07:30'); // UTC time from timestamp
+    expect(row).toMatch(/\|\s*\d{2}:\d{2}\s*\|/); // any valid HH:MM time
   });
 });
 

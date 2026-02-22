@@ -43,7 +43,11 @@ export default class DosePlugin extends Plugin {
     const folder = this.store.getSettings().protocolsFolder;
     const protocols = await loadProtocols(this.app, folder);
     for (const protocol of protocols) {
-      this.store.upsertProtocol(protocol);
+      const existing = this.store.getProtocols().find(p => p.id === protocol.id);
+      this.store.upsertProtocol({
+        ...protocol,
+        status: existing?.status ?? protocol.status,
+      });
     }
     await this.store.save();
   }

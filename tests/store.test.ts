@@ -91,4 +91,34 @@ describe('Store', () => {
     expect(store.getSettings().dailyNotesFolder).toBe('Notes');
     expect(store.getSettings().injectionSites.length).toBeGreaterThan(0);
   });
+
+  test('defaults supplementGroups to [] when loading old protocol without it', () => {
+    const oldProtocol = {
+      id: 'old.md',
+      name: 'Old Protocol',
+      status: 'active' as const,
+      startDate: '2026-01-01',
+      durationWeeks: 12,
+      compounds: [],
+      filePath: 'old.md',
+      // intentionally missing supplementGroups
+    };
+    const s = new Store({ protocols: [oldProtocol as any] }, async () => {});
+    expect(s.getProtocols()[0].supplementGroups).toEqual([]);
+  });
+
+  test('defaults compoundType to injectable when loading old log without it', () => {
+    const oldLog = {
+      id: 'old-log',
+      protocolId: 'old.md',
+      compoundName: 'BPC-157',
+      dose: '250mcg',
+      site: '',
+      timestamp: '2026-01-01T08:00:00Z',
+      status: 'taken' as const,
+      // intentionally missing compoundType
+    };
+    const s = new Store({ doseLogs: [oldLog as any] }, async () => {});
+    expect(s.getDoseLogsForDate('2026-01-01')[0].compoundType).toBe('injectable');
+  });
 });

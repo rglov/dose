@@ -8,6 +8,7 @@ const mockProtocol: Protocol = {
   startDate: '2026-02-22',
   durationWeeks: 12,
   compounds: [],
+  supplementGroups: [],
   filePath: 'Protocols/test.md',
 };
 
@@ -17,6 +18,7 @@ const mockLog: DoseLog = {
   compoundName: 'BPC-157',
   dose: '250mcg',
   site: 'Left abdomen',
+  compoundType: 'injectable',
   timestamp: '2026-02-22T07:30:00.000Z',
   status: 'taken',
 };

@@ -1,4 +1,4 @@
-import { DoseStore, Protocol, DoseLog, DoseSettings } from './types';
+import { DoseStore, Protocol, DoseLog, DoseSettings, SupplementGroup } from './types';
 
 const DEFAULT_SETTINGS: DoseSettings = {
   protocolsFolder: 'Protocols',
@@ -24,8 +24,12 @@ export class Store {
   constructor(saved: Partial<DoseStore>, saveCallback: (data: DoseStore) => Promise<void>) {
     this.data = {
       version: saved.version ?? DEFAULT_STORE.version,
-      protocols: saved.protocols ? [...saved.protocols] : [],
-      doseLogs: saved.doseLogs ? [...saved.doseLogs] : [],
+      protocols: saved.protocols
+        ? saved.protocols.map(p => ({ supplementGroups: [] as SupplementGroup[], ...p }))
+        : [],
+      doseLogs: saved.doseLogs
+        ? saved.doseLogs.map(l => ({ compoundType: 'injectable' as const, ...l }))
+        : [],
       settings: { ...DEFAULT_SETTINGS, ...(saved.settings ?? {}) },
     };
     this.saveCallback = saveCallback;

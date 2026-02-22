@@ -14,6 +14,16 @@ export interface Compound {
   frequency: CompoundFrequency;
 }
 
+export interface SupplementItem {
+  name: string;
+  dose: string; // e.g. "3x", "5mg", "" if not specified
+}
+
+export interface SupplementGroup {
+  timeLabel: string; // e.g. "Morning (fasted)", "Breakfast 8AM"
+  items: SupplementItem[];
+}
+
 export interface Protocol {
   id: string;          // vault file path, used as unique key
   name: string;
@@ -21,6 +31,7 @@ export interface Protocol {
   startDate: string;   // YYYY-MM-DD
   durationWeeks: number;
   compounds: Compound[];
+  supplementGroups: SupplementGroup[];
   filePath: string;
 }
 
@@ -30,6 +41,7 @@ export interface DoseLog {
   compoundName: string;
   dose: string;
   site: string;
+  compoundType: 'injectable' | 'supplement';
   timestamp: string;   // ISO 8601
   status: DoseStatus;
 }

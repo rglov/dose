@@ -19,6 +19,7 @@ const protocol: Protocol = {
     makeCompound('Twice Daily', 'twice_daily'),
     makeCompound('Mon Thu Drug', 'weekly', [1, 4]),
   ],
+  supplementGroups: [],
   filePath: 'test.md',
 };
 
@@ -63,7 +64,7 @@ describe('getExpectedDoseCount', () => {
 describe('calculateAdherence', () => {
   test('returns 100% when all doses taken', () => {
     const logs: DoseLog[] = [
-      { id: '1', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', timestamp: '2026-02-23T08:00:00Z', status: 'taken' },
+      { id: '1', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', compoundType: 'injectable', timestamp: '2026-02-23T08:00:00Z', status: 'taken' },
     ];
     const start = new Date('2026-02-23');
     const end = new Date('2026-02-23');
@@ -81,9 +82,9 @@ describe('calculateAdherence', () => {
   test('ignores logs outside the date range', () => {
     const logs: DoseLog[] = [
       // This log is BEFORE the window
-      { id: '0', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', timestamp: '2026-02-01T08:00:00Z', status: 'taken' },
+      { id: '0', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', compoundType: 'injectable', timestamp: '2026-02-01T08:00:00Z', status: 'taken' },
       // This log is IN the window
-      { id: '1', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', timestamp: '2026-02-23T08:00:00Z', status: 'taken' },
+      { id: '1', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', compoundType: 'injectable', timestamp: '2026-02-23T08:00:00Z', status: 'taken' },
     ];
     const start = new Date('2026-02-23T00:00:00Z');
     const end = new Date('2026-02-23T23:59:59Z');

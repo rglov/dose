@@ -67,7 +67,9 @@ export class Store {
     return this.data.doseLogs.filter(l => l.protocolId === protocolId);
   }
 
-  getSettings(): DoseSettings { return this.data.settings; }
+  getSettings(): DoseSettings {
+    return { ...this.data.settings, injectionSites: [...this.data.settings.injectionSites] };
+  }
 
   updateSettings(settings: Partial<DoseSettings>): void {
     this.data.settings = { ...this.data.settings, ...settings };
@@ -77,5 +79,6 @@ export class Store {
     await this.saveCallback(this.data);
   }
 
+  /** Returns the store data for serialization. Do not mutate the returned object. */
   getData(): DoseStore { return this.data; }
 }

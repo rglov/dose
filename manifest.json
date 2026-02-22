@@ -1,0 +1,10 @@
+{
+  "id": "dose",
+  "name": "Dose",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Track peptide, supplement, and medication protocols with adherence dashboards.",
+  "author": "rglov",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

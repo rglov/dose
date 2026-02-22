@@ -23,22 +23,28 @@ export function calculateAdherence(
 ): Record<string, number> {
   const result: Record<string, number> = {};
 
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+
   for (const compound of protocol.compounds) {
     let expected = 0;
-    const current = new Date(startDate);
-    current.setHours(0, 0, 0, 0);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    // Iterate day-by-day using UTC dates to avoid local-timezone drift
+    const current = new Date(startStr + 'T00:00:00Z');
+    const end = new Date(endStr + 'T00:00:00Z');
 
     while (current <= end) {
       if (getDueToday(protocol, current).some(c => c.name === compound.name)) {
         expected += getExpectedDoseCount(compound);
       }
-      current.setDate(current.getDate() + 1);
+      current.setUTCDate(current.getUTCDate() + 1);
     }
 
     const taken = logs.filter(
-      l => l.compoundName === compound.name && l.status === 'taken',
+      l =>
+        l.compoundName === compound.name &&
+        l.status === 'taken' &&
+        l.timestamp >= startStr &&
+        l.timestamp <= endStr + 'T23:59:59.999Z',
     ).length;
 
     result[compound.name] = expected > 0 ? Math.round((taken / expected) * 100) : 0;
@@ -47,16 +53,16 @@ export function calculateAdherence(
   return result;
 }
 
-export function calculateStreak(logs: DoseLog[], protocol: Protocol): number {
+export function calculateStreak(logs: DoseLog[], protocol: Protocol, today?: Date): number {
   if (!logs.length) return 0;
 
   let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const todayDate = today ? new Date(today) : new Date();
+  todayDate.setHours(0, 0, 0, 0);
 
   for (let i = 0; i < 365; i++) {
-    const checkDate = new Date(today);
-    checkDate.setDate(today.getDate() - i);
+    const checkDate = new Date(todayDate);
+    checkDate.setDate(todayDate.getDate() - i);
     const dateStr = checkDate.toISOString().split('T')[0];
 
     const dueCompounds = getDueToday(protocol, checkDate);

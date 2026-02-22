@@ -77,10 +77,28 @@ describe('calculateAdherence', () => {
     const result = calculateAdherence(protocol, [], start, end);
     expect(result['Daily Drug']).toBe(0);
   });
+
+  test('ignores logs outside the date range', () => {
+    const logs: DoseLog[] = [
+      // This log is BEFORE the window
+      { id: '0', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', timestamp: '2026-02-01T08:00:00Z', status: 'taken' },
+      // This log is IN the window
+      { id: '1', protocolId: 'test.md', compoundName: 'Daily Drug', dose: '10mg', site: '', timestamp: '2026-02-23T08:00:00Z', status: 'taken' },
+    ];
+    const start = new Date('2026-02-23T00:00:00Z');
+    const end = new Date('2026-02-23T23:59:59Z');
+    const result = calculateAdherence(protocol, logs, start, end);
+    expect(result['Daily Drug']).toBe(100); // only 1 expected, only 1 in window
+  });
 });
 
 describe('calculateStreak', () => {
   test('returns 0 with no logs', () => {
     expect(calculateStreak([], protocol)).toBe(0);
+  });
+
+  test('accepts optional today parameter for testability', () => {
+    // Should not throw when today is provided
+    expect(() => calculateStreak([], protocol, new Date('2026-02-23'))).not.toThrow();
   });
 });

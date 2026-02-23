@@ -32,7 +32,7 @@ export class Store {
           }))
         : [],
       doseLogs: saved.doseLogs
-        ? saved.doseLogs.map(l => ({ ...l, compoundType: (l as DoseLog).compoundType ?? ('injectable' as const) }))
+        ? saved.doseLogs.map(l => ({ ...l, compoundType: l.compoundType ?? 'injectable' }))
         : [],
       settings: { ...DEFAULT_SETTINGS, ...(saved.settings ?? {}) },
     };

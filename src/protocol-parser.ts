@@ -86,7 +86,7 @@ function parseFrequency(freqStr: string): CompoundFrequency {
 }
 
 export function parseSupplements(content: string): SupplementGroup[] {
-  const sectionMatch = content.match(/## Supplements\r?\n([\s\S]*?)(?:\n## [^#]|$)/);
+  const sectionMatch = content.match(/## Supplements\r?\n([\s\S]*?)(?:\r?\n## [^#]|$)/);
   if (!sectionMatch) return [];
 
   const sectionBody = sectionMatch[1];

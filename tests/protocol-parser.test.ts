@@ -163,6 +163,27 @@ not a bullet
     expect(groups[0].timeLabel).toBe('Good Group');
   });
 
+  test('stops at next ## section boundary', () => {
+    const content = `---
+name: "Test"
+status: active
+start_date: 2026-01-01
+duration_weeks: 4
+---
+
+## Supplements
+### Morning
+- Vitamin D: 5000IU
+
+## Notes
+Some notes here`;
+    const groups = parseSupplements(content);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].timeLabel).toBe('Morning');
+    expect(groups[0].items).toHaveLength(1);
+    expect(groups[0].items[0].name).toBe('Vitamin D');
+  });
+
   test('parseProtocol includes supplementGroups', () => {
     const result = parseProtocol(SAMPLE_WITH_SUPPLEMENTS, 'test.md');
     expect(result?.supplementGroups).toHaveLength(3);

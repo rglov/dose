@@ -27,8 +27,8 @@ export class Store {
       protocols: saved.protocols
         ? saved.protocols.map(p => ({
             ...p,
-            type: ((p as Protocol).type ?? 'injectable') as ProtocolType,
-            supplementGroups: (p as Protocol).supplementGroups ?? ([] as SupplementGroup[]),
+            type: p.type ?? 'injectable',
+            supplementGroups: p.supplementGroups ?? [],
           }))
         : [],
       doseLogs: saved.doseLogs
@@ -73,7 +73,7 @@ export class Store {
 
   deactivateProtocol(id: string): void {
     const idx = this.data.protocols.findIndex(p => p.id === id);
-    if (idx >= 0) {
+    if (idx >= 0 && this.data.protocols[idx].status === 'active') {
       this.data.protocols[idx] = { ...this.data.protocols[idx], status: 'paused' };
     }
   }

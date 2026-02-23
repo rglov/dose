@@ -43,7 +43,7 @@ export interface DoseLog {
   compoundName: string;
   dose: string;
   site: string;
-  compoundType: 'injectable' | 'supplement';
+  compoundType: ProtocolType;
   timestamp: string;   // ISO 8601
   status: DoseStatus;
 }

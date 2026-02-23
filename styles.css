@@ -164,3 +164,17 @@
   border: 1px solid var(--background-modifier-border);
   cursor: pointer;
 }
+
+.dose-supplement-group-label {
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 12px 0 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dose-supplement-time {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  margin-left: 4px;
+}

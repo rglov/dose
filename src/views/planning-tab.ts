@@ -38,7 +38,7 @@ function renderSection(
   protocols: Protocol[],
   plugin: DosePlugin,
   refresh: () => void,
-  multiActive: boolean,
+  showDeactivateButton: boolean,
 ): void {
   const groups: Record<string, Protocol[]> = {
     active: protocols.filter(p => p.status === 'active'),
@@ -52,7 +52,7 @@ function renderSection(
     el.createEl('h4', { text: status.charAt(0).toUpperCase() + status.slice(1) });
     const list = el.createEl('ul', { cls: 'dose-protocol-list' });
     for (const protocol of group) {
-      renderProtocolItem(list, protocol, plugin, refresh, multiActive);
+      renderProtocolItem(list, protocol, plugin, refresh, showDeactivateButton);
     }
   }
 }
@@ -62,7 +62,7 @@ function renderProtocolItem(
   protocol: Protocol,
   plugin: DosePlugin,
   refresh: () => void,
-  multiActive: boolean,
+  showDeactivateButton: boolean,
 ): void {
   const item = el.createEl('li', { cls: 'dose-protocol-item' });
   const info = item.createDiv({ cls: 'dose-protocol-info' });
@@ -83,6 +83,8 @@ function renderProtocolItem(
     info.createEl('span', {
       text: ` — ${protocol.supplementGroups.length} groups, ${totalItems} items`,
     });
+  } else {
+    info.createEl('span', { text: ' — no items', cls: 'dose-compound-list' });
   }
 
   const actions = item.createDiv({ cls: 'dose-protocol-actions' });
@@ -97,7 +99,7 @@ function renderProtocolItem(
     });
   } else {
     actions.createEl('span', { text: '✓ Active', cls: 'dose-active-badge' });
-    if (multiActive) {
+    if (showDeactivateButton) {
       const deactivateBtn = actions.createEl('button', { text: 'Deactivate', cls: 'dose-skip-btn' });
       deactivateBtn.addEventListener('click', async () => {
         plugin.store.deactivateProtocol(protocol.id);

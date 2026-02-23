@@ -44,6 +44,7 @@ export default class DosePlugin extends Plugin {
     const protocols = await loadProtocols(this.app, folder);
     for (const protocol of protocols) {
       const existing = this.store.getProtocols().find(p => p.id === protocol.id);
+      // type is intentionally re-read from frontmatter on each refresh; the vault file is the source of truth
       this.store.upsertProtocol({
         ...protocol,
         status: existing?.status ?? protocol.status,

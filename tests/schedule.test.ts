@@ -12,6 +12,7 @@ const protocol: Protocol = {
   id: 'test.md',
   name: 'Test',
   status: 'active',
+  type: 'injectable',
   startDate: '2026-02-22',
   durationWeeks: 12,
   compounds: [

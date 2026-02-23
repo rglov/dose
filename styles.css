@@ -189,12 +189,6 @@
   font-size: 0.8em;
 }
 
-.dose-supplement-time {
-  color: var(--text-muted);
-  font-size: 0.85em;
-  margin-left: 4px;
-}
-
 .dose-supplement-protocol-label {
   font-weight: 700;
   font-size: 0.9em;

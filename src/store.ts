@@ -41,6 +41,7 @@ export class Store {
 
   getProtocols(): Protocol[] { return this.data.protocols; }
 
+  /** @deprecated Use getActiveProtocols() for multi-protocol support. Kept for backward compatibility. */
   getActiveProtocol(): Protocol | undefined {
     return this.data.protocols.find(p => p.status === 'active' && p.type === 'injectable');
   }

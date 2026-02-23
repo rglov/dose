@@ -31,14 +31,38 @@ export function renderDashboardTab(el: HTMLElement, plugin: DosePlugin): void {
   const streak = calculateStreak(logs, protocol);
   el.createEl('p', { text: `🔥 Current streak: ${streak} day${streak !== 1 ? 's' : ''}` });
 
-  // Adherence per compound
-  el.createEl('h4', { text: 'Adherence' });
+  // Adherence per injectable compound
+  el.createEl('h4', { text: 'Injectable Adherence' });
   const adherence = calculateAdherence(protocol, logs, startDate, today);
   const adList = el.createEl('ul', { cls: 'dose-adherence-list' });
   for (const [name, adherencePct] of Object.entries(adherence)) {
     const item = adList.createEl('li');
     item.createEl('span', { text: `${name}: ` });
     item.createEl('strong', { text: `${adherencePct}%` });
+  }
+
+  // Supplement adherence
+  if (protocol.supplementGroups.length > 0) {
+    el.createEl('h4', { text: 'Supplement Adherence' });
+    const daysElapsed = Math.max(1, Math.floor(
+      (today.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
+    ) + 1);
+    const supAdList = el.createEl('ul', { cls: 'dose-adherence-list' });
+
+    for (const group of protocol.supplementGroups) {
+      for (const item of group.items) {
+        const expected = daysElapsed;
+        const taken = logs.filter(
+          l => l.compoundName === item.name &&
+               l.compoundType === 'supplement' &&
+               l.status === 'taken',
+        ).length;
+        const pct = Math.round((taken / expected) * 100);
+        const li = supAdList.createEl('li');
+        li.createEl('span', { text: `${item.name} (${group.timeLabel}): ` });
+        li.createEl('strong', { text: `${pct}%` });
+      }
+    }
   }
 
   // Heatmap — last 30 days
@@ -64,10 +88,13 @@ function renderHeatmap(el: HTMLElement, protocol: Protocol, logs: DoseLog[], tod
 
     const dueCompounds = getDueToday(protocol, date);
     const dayLogs = logs.filter(l => l.timestamp.startsWith(dateStr) && l.status === 'taken');
-    const totalExpected = dueCompounds.reduce((sum, c) => sum + getExpectedDoseCount(c), 0);
+    const supplementCount = protocol.supplementGroups.reduce(
+      (sum, g) => sum + g.items.length, 0,
+    );
+    const totalExpected = dueCompounds.reduce((sum, c) => sum + getExpectedDoseCount(c), 0) + supplementCount;
 
     let cls = 'dose-heatmap-cell';
-    if (!dueCompounds.length) cls += ' none';
+    if (!dueCompounds.length && !supplementCount) cls += ' none';
     else if (dayLogs.length === 0) cls += ' missed';
     else if (dayLogs.length < totalExpected) cls += ' partial';
     else cls += ' full';

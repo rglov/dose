@@ -42,6 +42,7 @@ export function renderDashboardTab(el: HTMLElement, plugin: DosePlugin): void {
   }
 
   // Supplement adherence
+  const startStr = startDate.toISOString().split('T')[0];
   if (protocol.supplementGroups.length > 0) {
     el.createEl('h4', { text: 'Supplement Adherence' });
     const daysElapsed = Math.max(1, Math.floor(
@@ -55,9 +56,10 @@ export function renderDashboardTab(el: HTMLElement, plugin: DosePlugin): void {
         const taken = logs.filter(
           l => l.compoundName === item.name &&
                l.compoundType === 'supplement' &&
-               l.status === 'taken',
+               l.status === 'taken' &&
+               l.timestamp >= startStr,
         ).length;
-        const pct = Math.round((taken / expected) * 100);
+        const pct = Math.min(100, Math.round((taken / expected) * 100));
         const li = supAdList.createEl('li');
         li.createEl('span', { text: `${item.name} (${group.timeLabel}): ` });
         li.createEl('strong', { text: `${pct}%` });
@@ -76,6 +78,9 @@ export function renderDashboardTab(el: HTMLElement, plugin: DosePlugin): void {
 
 function renderHeatmap(el: HTMLElement, protocol: Protocol, logs: DoseLog[], today: Date): void {
   const grid = el.createDiv({ cls: 'dose-heatmap' });
+  const supplementCount = protocol.supplementGroups.reduce(
+    (sum, g) => sum + g.items.length, 0,
+  );
 
   for (let i = 29; i >= 0; i--) {
     const date = new Date(today);
@@ -88,9 +93,6 @@ function renderHeatmap(el: HTMLElement, protocol: Protocol, logs: DoseLog[], tod
 
     const dueCompounds = getDueToday(protocol, date);
     const dayLogs = logs.filter(l => l.timestamp.startsWith(dateStr) && l.status === 'taken');
-    const supplementCount = protocol.supplementGroups.reduce(
-      (sum, g) => sum + g.items.length, 0,
-    );
     const totalExpected = dueCompounds.reduce((sum, c) => sum + getExpectedDoseCount(c), 0) + supplementCount;
 
     let cls = 'dose-heatmap-cell';

@@ -103,7 +103,15 @@ export function renderTodayTab(el: HTMLElement, plugin: DosePlugin, refresh: () 
   const supplementProtocols = activeProtocols.filter(p => p.supplementGroups.length > 0);
   const showProtocolLabel = supplementProtocols.length > 1;
 
-  if (supplementProtocols.length > 0) {
+  const hasUnloggedSupplements = supplementProtocols.some(protocol =>
+    protocol.supplementGroups.some(group =>
+      group.items.some(item =>
+        !todayLogs.some(l => l.compoundName === item.name && l.compoundType === 'supplement')
+      )
+    )
+  );
+
+  if (hasUnloggedSupplements) {
     el.createEl('h4', { text: 'Supplements' });
 
     for (const protocol of supplementProtocols) {
@@ -184,7 +192,7 @@ export function renderTodayTab(el: HTMLElement, plugin: DosePlugin, refresh: () 
     }
   }
 
-  if (!dueItems.length && !supplementProtocols.length) {
+  if (!dueItems.length && !hasUnloggedSupplements) {
     el.createEl('p', { text: 'Nothing scheduled today.' });
   }
 }

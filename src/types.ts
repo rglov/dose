@@ -1,4 +1,5 @@
 export type ProtocolStatus = 'active' | 'planned' | 'paused' | 'completed';
+export type ProtocolType = 'injectable' | 'supplement';
 export type DoseStatus = 'taken' | 'skipped' | 'extra';
 export type FrequencyType = 'daily' | 'twice_daily' | 'weekly';
 
@@ -27,6 +28,7 @@ export interface SupplementGroup {
 export interface Protocol {
   id: string;          // vault file path, used as unique key
   name: string;
+  type: ProtocolType;  // 'injectable' | 'supplement'
   status: ProtocolStatus;
   startDate: string;   // YYYY-MM-DD
   durationWeeks: number;

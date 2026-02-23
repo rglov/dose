@@ -4,6 +4,7 @@ import { Protocol, DoseLog } from '../src/types';
 const mockProtocol: Protocol = {
   id: 'Protocols/test.md',
   name: 'Test Protocol',
+  type: 'injectable',
   status: 'planned',
   startDate: '2026-02-22',
   durationWeeks: 12,
@@ -120,5 +121,46 @@ describe('Store', () => {
     };
     const s = new Store({ doseLogs: [oldLog as any] }, async () => {});
     expect(s.getDoseLogsForDate('2026-01-01')[0].compoundType).toBe('injectable');
+  });
+
+  // --- Multi-protocol tests ---
+
+  test('getActiveProtocols returns all active protocols', () => {
+    store.upsertProtocol({ ...mockProtocol, id: 'a.md', status: 'active', type: 'injectable' });
+    store.upsertProtocol({ ...mockProtocol, id: 'b.md', status: 'active', type: 'supplement' });
+    store.upsertProtocol({ ...mockProtocol, id: 'c.md', status: 'planned', type: 'supplement' });
+    expect(store.getActiveProtocols()).toHaveLength(2);
+  });
+
+  test('getActiveProtocol returns only active injectable', () => {
+    store.upsertProtocol({ ...mockProtocol, id: 'a.md', status: 'active', type: 'injectable' });
+    store.upsertProtocol({ ...mockProtocol, id: 'b.md', status: 'active', type: 'supplement' });
+    expect(store.getActiveProtocol()?.id).toBe('a.md');
+  });
+
+  test('activating injectable pauses other active injectable but not supplement', () => {
+    store.upsertProtocol({ ...mockProtocol, id: 'inj1.md', status: 'active', type: 'injectable' });
+    store.upsertProtocol({ ...mockProtocol, id: 'inj2.md', status: 'planned', type: 'injectable' });
+    store.upsertProtocol({ ...mockProtocol, id: 'sup.md', status: 'active', type: 'supplement' });
+    store.activateProtocol('inj2.md');
+    expect(store.getProtocols().find(p => p.id === 'inj1.md')?.status).toBe('paused');
+    expect(store.getProtocols().find(p => p.id === 'inj2.md')?.status).toBe('active');
+    expect(store.getProtocols().find(p => p.id === 'sup.md')?.status).toBe('active');
+  });
+
+  test('activating supplement does not affect other protocols', () => {
+    store.upsertProtocol({ ...mockProtocol, id: 'inj.md', status: 'active', type: 'injectable' });
+    store.upsertProtocol({ ...mockProtocol, id: 'sup1.md', status: 'active', type: 'supplement' });
+    store.upsertProtocol({ ...mockProtocol, id: 'sup2.md', status: 'planned', type: 'supplement' });
+    store.activateProtocol('sup2.md');
+    expect(store.getProtocols().find(p => p.id === 'inj.md')?.status).toBe('active');
+    expect(store.getProtocols().find(p => p.id === 'sup1.md')?.status).toBe('active');
+    expect(store.getProtocols().find(p => p.id === 'sup2.md')?.status).toBe('active');
+  });
+
+  test('deactivateProtocol sets status to paused', () => {
+    store.upsertProtocol({ ...mockProtocol, id: 'sup.md', status: 'active', type: 'supplement' });
+    store.deactivateProtocol('sup.md');
+    expect(store.getProtocols().find(p => p.id === 'sup.md')?.status).toBe('paused');
   });
 });

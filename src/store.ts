@@ -1,4 +1,4 @@
-import { DoseStore, Protocol, DoseLog, DoseSettings, SupplementGroup } from './types';
+import { DoseStore, Protocol, DoseLog, DoseSettings, SupplementGroup, ProtocolType } from './types';
 
 const DEFAULT_SETTINGS: DoseSettings = {
   protocolsFolder: 'Protocols',
@@ -25,7 +25,11 @@ export class Store {
     this.data = {
       version: saved.version ?? DEFAULT_STORE.version,
       protocols: saved.protocols
-        ? saved.protocols.map(p => ({ ...p, supplementGroups: (p as Protocol).supplementGroups ?? ([] as SupplementGroup[]) }))
+        ? saved.protocols.map(p => ({
+            ...p,
+            type: ((p as Protocol).type ?? 'injectable') as ProtocolType,
+            supplementGroups: (p as Protocol).supplementGroups ?? ([] as SupplementGroup[]),
+          }))
         : [],
       doseLogs: saved.doseLogs
         ? saved.doseLogs.map(l => ({ ...l, compoundType: (l as DoseLog).compoundType ?? ('injectable' as const) }))
@@ -38,7 +42,11 @@ export class Store {
   getProtocols(): Protocol[] { return this.data.protocols; }
 
   getActiveProtocol(): Protocol | undefined {
-    return this.data.protocols.find(p => p.status === 'active');
+    return this.data.protocols.find(p => p.status === 'active' && p.type === 'injectable');
+  }
+
+  getActiveProtocols(): Protocol[] {
+    return this.data.protocols.filter(p => p.status === 'active');
   }
 
   upsertProtocol(protocol: Protocol): void {
@@ -51,12 +59,23 @@ export class Store {
   }
 
   activateProtocol(id: string): void {
+    const target = this.data.protocols.find(p => p.id === id);
+    if (!target) return;
     this.data.protocols = this.data.protocols.map(p => ({
       ...p,
       status: p.id === id
         ? 'active'
-        : p.status === 'active' ? 'paused' : p.status,
+        : (target.type === 'injectable' && p.type === 'injectable' && p.status === 'active')
+          ? 'paused'
+          : p.status,
     }));
+  }
+
+  deactivateProtocol(id: string): void {
+    const idx = this.data.protocols.findIndex(p => p.id === id);
+    if (idx >= 0) {
+      this.data.protocols[idx] = { ...this.data.protocols[idx], status: 'paused' };
+    }
   }
 
   addDoseLog(log: DoseLog): void {

@@ -1,4 +1,4 @@
-import { Protocol, Compound, CompoundFrequency, FrequencyType, ProtocolStatus, SupplementGroup, SupplementItem } from './types';
+import { Protocol, Compound, CompoundFrequency, FrequencyType, ProtocolStatus, ProtocolType, SupplementGroup, SupplementItem } from './types';
 
 const DAY_MAP: Record<string, number> = {
   Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
@@ -10,10 +10,13 @@ export function parseProtocol(content: string, filePath: string): Protocol | nul
 
   const VALID_STATUSES: ProtocolStatus[] = ['active', 'planned', 'paused', 'completed'];
   const rawStatus = frontmatter['status'];
+  const VALID_TYPES: ProtocolType[] = ['injectable', 'supplement'];
+  const rawType = frontmatter['type'];
 
   return {
     id: filePath,
     name: frontmatter['name'] ?? 'Unknown',
+    type: VALID_TYPES.includes(rawType as ProtocolType) ? (rawType as ProtocolType) : 'injectable',
     status: VALID_STATUSES.includes(rawStatus as ProtocolStatus)
       ? (rawStatus as ProtocolStatus)
       : 'planned',

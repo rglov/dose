@@ -1,4 +1,4 @@
-import { Protocol, Compound, CompoundFrequency, FrequencyType, ProtocolStatus } from './types';
+import { Protocol, Compound, CompoundFrequency, FrequencyType, ProtocolStatus, SupplementGroup, SupplementItem } from './types';
 
 const DAY_MAP: Record<string, number> = {
   Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
@@ -20,6 +20,7 @@ export function parseProtocol(content: string, filePath: string): Protocol | nul
     startDate: frontmatter['start_date'] ?? '',
     durationWeeks: Number(frontmatter['duration_weeks']) || 0,
     compounds: parseCompounds(content),
+    supplementGroups: parseSupplements(content),
     filePath,
   };
 }
@@ -82,4 +83,43 @@ function parseFrequency(freqStr: string): CompoundFrequency {
   }
 
   return { type: 'daily' };
+}
+
+export function parseSupplements(content: string): SupplementGroup[] {
+  const sectionMatch = content.match(/## Supplements\r?\n([\s\S]*?)(?:\n## [^#]|$)/);
+  if (!sectionMatch) return [];
+
+  const sectionBody = sectionMatch[1];
+  const rawGroups = sectionBody.split(/(?=### )/);
+
+  const groups: SupplementGroup[] = [];
+
+  for (const chunk of rawGroups) {
+    const lines = chunk.split(/\r?\n/);
+    const headerLine = lines[0];
+    if (!headerLine.startsWith('### ')) continue;
+
+    const timeLabel = headerLine.slice(4).trim();
+    const items: SupplementItem[] = [];
+
+    for (const line of lines.slice(1)) {
+      if (!line.startsWith('- ')) continue;
+      const body = line.slice(2).trim();
+      const colonIdx = body.indexOf(':');
+      if (colonIdx >= 0) {
+        items.push({
+          name: body.slice(0, colonIdx).trim(),
+          dose: body.slice(colonIdx + 1).trim(),
+        });
+      } else {
+        items.push({ name: body, dose: '' });
+      }
+    }
+
+    if (items.length > 0) {
+      groups.push({ timeLabel, items });
+    }
+  }
+
+  return groups;
 }

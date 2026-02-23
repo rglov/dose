@@ -194,3 +194,52 @@ Some notes here`;
     expect(result?.supplementGroups).toEqual([]);
   });
 });
+
+describe('parseProtocol type field', () => {
+  test('parses type: injectable from frontmatter', () => {
+    const content = `---
+name: "Test"
+type: injectable
+status: active
+start_date: 2026-01-01
+duration_weeks: 4
+---
+`;
+    expect(parseProtocol(content, 'test.md')?.type).toBe('injectable');
+  });
+
+  test('parses type: supplement from frontmatter', () => {
+    const content = `---
+name: "Test"
+type: supplement
+status: active
+start_date: 2026-01-01
+duration_weeks: 4
+---
+`;
+    expect(parseProtocol(content, 'test.md')?.type).toBe('supplement');
+  });
+
+  test('defaults type to injectable when missing', () => {
+    const content = `---
+name: "Test"
+status: active
+start_date: 2026-01-01
+duration_weeks: 4
+---
+`;
+    expect(parseProtocol(content, 'test.md')?.type).toBe('injectable');
+  });
+
+  test('defaults type to injectable when invalid', () => {
+    const content = `---
+name: "Test"
+type: blah
+status: active
+start_date: 2026-01-01
+duration_weeks: 4
+---
+`;
+    expect(parseProtocol(content, 'test.md')?.type).toBe('injectable');
+  });
+});

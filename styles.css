@@ -165,16 +165,41 @@
   cursor: pointer;
 }
 
-.dose-supplement-group-label {
-  font-weight: 600;
-  color: var(--text-normal);
+.dose-supplement-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 12px 0 4px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.dose-supplement-group-label {
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.dose-log-all-btn {
+  background: transparent;
+  border: 1px solid var(--interactive-accent);
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  color: var(--interactive-accent);
+  font-size: 0.8em;
 }
 
 .dose-supplement-time {
   color: var(--text-muted);
   font-size: 0.85em;
   margin-left: 4px;
+}
+
+.dose-supplement-protocol-label {
+  font-weight: 700;
+  font-size: 0.9em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 16px 0 4px;
 }

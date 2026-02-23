@@ -10,33 +10,35 @@ export function renderDashboardTab(el: HTMLElement, plugin: DosePlugin): void {
     return;
   }
 
+  const today = new Date();
   for (const protocol of activeProtocols) {
     const logs = plugin.store.getDoseLogsForProtocol(protocol.id);
     if (protocol.type === 'injectable') {
-      renderInjectableCard(el, protocol, logs);
+      renderInjectableCard(el, protocol, logs, today);
     } else {
-      renderSupplementCard(el, protocol, logs);
+      renderSupplementCard(el, protocol, logs, today);
     }
   }
 }
 
-function renderInjectableCard(el: HTMLElement, protocol: Protocol, logs: DoseLog[]): void {
+function renderInjectableCard(el: HTMLElement, protocol: Protocol, logs: DoseLog[], today: Date): void {
   const startDate = new Date(protocol.startDate);
-  const today = new Date();
 
   const card = el.createDiv({ cls: 'dose-protocol-card' });
   card.createEl('h3', { text: protocol.name });
 
   // Cycle progress
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const weeksElapsed = Math.max(0, Math.floor((today.getTime() - startDate.getTime()) / msPerWeek));
-  const weekNum = Math.min(weeksElapsed + 1, protocol.durationWeeks);
-  const pct = Math.min(100, Math.round((weeksElapsed / protocol.durationWeeks) * 100));
+  if (protocol.durationWeeks > 0) {
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    const weeksElapsed = Math.max(0, Math.floor((today.getTime() - startDate.getTime()) / msPerWeek));
+    const weekNum = Math.min(weeksElapsed + 1, protocol.durationWeeks);
+    const pct = Math.min(100, Math.round((weeksElapsed / protocol.durationWeeks) * 100));
 
-  const progress = card.createDiv({ cls: 'dose-progress' });
-  progress.createEl('p', { text: `Week ${weekNum} of ${protocol.durationWeeks} — ${pct}% complete` });
-  const bar = progress.createDiv({ cls: 'dose-progress-bar' });
-  bar.createDiv({ cls: 'dose-progress-fill', attr: { style: `width: ${pct}%` } });
+    const progress = card.createDiv({ cls: 'dose-progress' });
+    progress.createEl('p', { text: `Week ${weekNum} of ${protocol.durationWeeks} — ${pct}% complete` });
+    const bar = progress.createDiv({ cls: 'dose-progress-bar' });
+    bar.createDiv({ cls: 'dose-progress-fill', attr: { style: `width: ${pct}%` } });
+  }
 
   // Streak
   const streak = calculateStreak(logs, protocol);
@@ -55,25 +57,7 @@ function renderInjectableCard(el: HTMLElement, protocol: Protocol, logs: DoseLog
   // Supplement adherence (if protocol has supplement groups)
   if (protocol.supplementGroups.length > 0) {
     card.createEl('h4', { text: 'Supplement Adherence' });
-    const startStr = startDate.toISOString().split('T')[0];
-    const daysElapsed = Math.max(1, Math.floor(
-      (today.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
-    ) + 1);
-    const supAdList = card.createEl('ul', { cls: 'dose-adherence-list' });
-    for (const group of protocol.supplementGroups) {
-      for (const item of group.items) {
-        const taken = logs.filter(
-          l => l.compoundName === item.name &&
-               l.compoundType === 'supplement' &&
-               l.status === 'taken' &&
-               l.timestamp >= startStr,
-        ).length;
-        const supPct = Math.min(100, Math.round((taken / daysElapsed) * 100));
-        const li = supAdList.createEl('li');
-        li.createEl('span', { text: `${item.name} (${group.timeLabel}): ` });
-        li.createEl('strong', { text: `${supPct}%` });
-      }
-    }
+    renderSupplementAdherence(card, protocol, logs, startDate, today);
   }
 
   // Heatmap
@@ -85,20 +69,34 @@ function renderInjectableCard(el: HTMLElement, protocol: Protocol, logs: DoseLog
   renderHistory(card, logs);
 }
 
-function renderSupplementCard(el: HTMLElement, protocol: Protocol, logs: DoseLog[]): void {
+function renderSupplementCard(el: HTMLElement, protocol: Protocol, logs: DoseLog[], today: Date): void {
   const startDate = new Date(protocol.startDate);
-  const today = new Date();
-  const startStr = startDate.toISOString().split('T')[0];
-  const daysElapsed = Math.max(1, Math.floor(
-    (today.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
-  ) + 1);
 
   const card = el.createDiv({ cls: 'dose-protocol-card' });
   card.createEl('h3', { text: protocol.name });
 
-  card.createEl('h4', { text: 'Supplement Adherence' });
-  const adList = card.createEl('ul', { cls: 'dose-adherence-list' });
+  if (protocol.supplementGroups.length === 0) {
+    card.createEl('p', { text: 'No supplement groups defined.' });
+    return;
+  }
 
+  card.createEl('h4', { text: 'Supplement Adherence' });
+  renderSupplementAdherence(card, protocol, logs, startDate, today);
+}
+
+function renderSupplementAdherence(
+  el: HTMLElement,
+  protocol: Protocol,
+  logs: DoseLog[],
+  startDate: Date,
+  today: Date,
+): void {
+  const startStr = startDate.toISOString().split('T')[0];
+  // Assumes 1 expected dose per supplement item per day
+  const daysElapsed = Math.max(1, Math.floor(
+    (today.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
+  ) + 1);
+  const adList = el.createEl('ul', { cls: 'dose-adherence-list' });
   for (const group of protocol.supplementGroups) {
     for (const item of group.items) {
       const taken = logs.filter(

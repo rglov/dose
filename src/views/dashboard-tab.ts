@@ -95,7 +95,7 @@ function renderSupplementAdherence(
   // Assumes 1 expected dose per supplement item per day
   const daysElapsed = Math.max(1, Math.floor(
     (today.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
-  ) + 1);
+  ));
   const adList = el.createEl('ul', { cls: 'dose-adherence-list' });
   for (const group of protocol.supplementGroups) {
     for (const item of group.items) {

@@ -25,10 +25,10 @@ export class Store {
     this.data = {
       version: saved.version ?? DEFAULT_STORE.version,
       protocols: saved.protocols
-        ? saved.protocols.map(p => ({ supplementGroups: [] as SupplementGroup[], ...p }))
+        ? saved.protocols.map(p => ({ ...p, supplementGroups: (p as Protocol).supplementGroups ?? ([] as SupplementGroup[]) }))
         : [],
       doseLogs: saved.doseLogs
-        ? saved.doseLogs.map(l => ({ compoundType: 'injectable' as const, ...l }))
+        ? saved.doseLogs.map(l => ({ ...l, compoundType: (l as DoseLog).compoundType ?? ('injectable' as const) }))
         : [],
       settings: { ...DEFAULT_SETTINGS, ...(saved.settings ?? {}) },
     };

@@ -73,6 +73,7 @@ export class LogDoseModal extends Modal {
               compoundName: this.compound.name,
               dose: this.dose,
               site: this.site,
+              compoundType: 'injectable',
               timestamp: this.timestamp,
               status: 'taken',
             };

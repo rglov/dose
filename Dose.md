@@ -1,0 +1,1 @@
+Build a native obsidian plugin that will easily track peptide, supplement, and medication protocols.  This should produce an easy to use tracker and adherence dashboards.  It should tie into the Peptide library and read the Protocol folder for updated protocols

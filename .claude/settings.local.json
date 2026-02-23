@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npx jest --listTests)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(echo:*)",
+      "Bash(git -C /Users/rglov/Documents/CRG/PROJECTS/Dose show:*)",
+      "Bash(node -e:*)",
+      "Bash(python3:*)",
+      "Bash(node --input-type=module:*)",
+      "Bash(npx jest --passWithNoTests)",
+      "Bash(# Check if ts-jest 29 supports top-level tsconfig in jest.config \\(not via globals\\) # This is the \"\"transform\"\" config style introduced in ts-jest 27/28 grep -r \"\"tsconfig\"\" /Users/rglov/Documents/CRG/PROJECTS/Dose/node_modules/ts-jest/dist/legacy/config/config-set.js)",
+      "Bash(npx jest:*)",
+      "Bash(/Users/rglov/Documents/CRG/PROJECTS/Dose/tests/edge-cases.test.ts:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git -C /Users/rglov/Documents/CRG/PROJECTS/Dose status)",
+      "Bash(git -C:*)",
+      "Bash(gh auth status:*)",
+      "Bash(brew install:*)",
+      "Bash(/opt/homebrew/bin/gh auth status:*)",
+      "Bash(/opt/homebrew/bin/gh repo create:*)",
+      "Bash(/Users/rglov/Documents/CRG/.obsidian/plugins/dose/data.json:*)"
+    ]
+  }
+}

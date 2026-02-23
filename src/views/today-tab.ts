@@ -99,7 +99,7 @@ export function renderTodayTab(el: HTMLElement, plugin: DosePlugin, refresh: () 
   }
 
   // --- Supplements ---
-  // All active protocols that have supplement groups
+  // Intentionally type-agnostic: injectable protocols with supplementGroups also appear here
   const supplementProtocols = activeProtocols.filter(p => p.supplementGroups.length > 0);
   const showProtocolLabel = supplementProtocols.length > 1;
 
@@ -114,7 +114,15 @@ export function renderTodayTab(el: HTMLElement, plugin: DosePlugin, refresh: () 
   if (hasUnloggedSupplements) {
     el.createEl('h4', { text: 'Supplements' });
 
-    for (const protocol of supplementProtocols) {
+    const protocolsWithUnloggedGroups = supplementProtocols.filter(protocol =>
+      protocol.supplementGroups.some(group =>
+        group.items.some(item =>
+          !todayLogs.some(l => l.compoundName === item.name && l.compoundType === 'supplement')
+        )
+      )
+    );
+
+    for (const protocol of protocolsWithUnloggedGroups) {
       if (showProtocolLabel) {
         el.createEl('p', { text: protocol.name, cls: 'dose-supplement-protocol-label' });
       }
